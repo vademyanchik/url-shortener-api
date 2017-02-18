@@ -9,17 +9,39 @@ db.setUpConnection();
 
 app.use(bodyParser.json());
 
-app.get('/links', (req, res) => {
+app.get('/api/links', (req, res) => {
   db.listLinks().then(data => res.send(data));
 });
 
-app.post('/link', (req, res) => {
+app.post('/api/link', (req, res) => {
   const { errors, isValid } = validateData(req.body);
   if (isValid) {
-    db.createLink(req.body).then(data => res.send(data));
+    db.createLink(req.body)
+    .then(data => res.send(data))
+    .catch(() => {
+      res.status(500).json({
+        errors: {
+          global: 'Something is wrong here',
+        },
+      });
+    });
   } else {
     res.status(400).json({ errors });
   }
+});
+
+app.get('/:id', (req, res) => {
+  db.redirectUrl(req.params.id)
+  .then((data) => {
+    res.redirect(data.url);
+  })
+  .catch(() => {
+    res.status(404).json({
+      errors: {
+        global: 'Something is wrong here',
+      },
+    });
+  });
 });
 
 app.use((req, res) => {

@@ -28,3 +28,10 @@ export function createLink(data) {
 
   return link.save();
 }
+
+export function redirectUrl(id) {
+  const query = { shortLink: `${baseUrl}/${id}` };
+  const count = { $inc: { count: 1 } };
+
+  return Link.findOneAndUpdate(query, count);
+}
