@@ -3,6 +3,7 @@
   "rules": {
     "func-names": ["error", "never"],
     "no-unused-vars": 0,
-    "no-console": 0
+    "no-console": 0,
+    "no-useless-escape": 0
   }
 }
