@@ -30,6 +30,40 @@ app.post('/api/link', (req, res) => {
   }
 });
 
+app.put('/api/links/:id', (req, res) => {
+  console.log(req.body);
+  const { errors, isValid } = validateData(req.body);
+  if (isValid) {
+    db.updateLink(req.body, req.params.id)
+    .then((data) => {
+      res.send(data);
+    })
+    .catch(() => {
+      res.status(500).json({
+        errors: {
+          global: 'Something is wrong here',
+        },
+      });
+    });
+  } else {
+    res.status(400).json({ errors });
+  }
+});
+
+app.get('/api/links/:id', (req, res) => {
+  db.getById(req.params.id)
+  .then((data) => {
+    res.send(data);
+  })
+  .catch(() => {
+    res.status(404).json({
+      errors: {
+        global: 'Something is wrong here',
+      },
+    });
+  });
+});
+
 app.get('/:id', (req, res) => {
   db.redirectUrl(req.params.id)
   .then((data) => {
@@ -51,7 +85,6 @@ app.use((req, res) => {
     },
   });
 });
-
 
 const server = app.listen(8080, () =>
   console.log('Server is up and running on port localhost:8080'),

@@ -25,13 +25,22 @@ export function createLink(data) {
     count: 0,
     createdAt: new Date(),
   });
-
   return link.save();
 }
 
 export function redirectUrl(id) {
   const query = { shortLink: `${baseUrl}/${id}` };
   const count = { $inc: { count: 1 } };
-
   return Link.findOneAndUpdate(query, count);
+}
+
+export function getById(id) {
+  const query = { _id: `${id}` };
+  return Link.findOne(query);
+}
+
+export function updateLink(data, id) {
+  const query = { _id: `${id}` };
+  const dataLink = { $set: { url: data.link, tags: data.tags } };
+  return Link.findOneAndUpdate(query, dataLink, { new: true });
 }
