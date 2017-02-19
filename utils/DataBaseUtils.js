@@ -28,13 +28,7 @@ export function createLink(data) {
   return link.save();
 }
 
-export function redirectUrl(id) {
-  const query = { shortLink: `${baseUrl}/${id}` };
-  const count = { $inc: { count: 1 } };
-  return Link.findOneAndUpdate(query, count);
-}
-
-export function getById(id) {
+export function getLink(id) {
   const query = { _id: `${id}` };
   return Link.findOne(query);
 }
@@ -43,4 +37,15 @@ export function updateLink(data, id) {
   const query = { _id: `${id}` };
   const dataLink = { $set: { url: data.link, tags: data.tags } };
   return Link.findOneAndUpdate(query, dataLink, { new: true });
+}
+
+export function deleteLink(id) {
+  const query = { _id: `${id}` };
+  return Link.remove(query);
+}
+
+export function redirectUrl(id) {
+  const query = { shortLink: `${baseUrl}/${id}` };
+  const count = { $inc: { count: 1 } };
+  return Link.findOneAndUpdate(query, count);
 }

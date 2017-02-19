@@ -10,7 +10,29 @@ db.setUpConnection();
 app.use(bodyParser.json());
 
 app.get('/api/links', (req, res) => {
-  db.listLinks().then(data => res.send(data));
+  db.listLinks()
+  .then(data => res.send(data))
+  .catch(() => {
+    res.status(404).json({
+      errors: {
+        global: 'Something is wrong here',
+      },
+    });
+  });
+});
+
+app.get('/api/links/:id', (req, res) => {
+  db.getLink(req.params.id)
+  .then((data) => {
+    res.send(data);
+  })
+  .catch(() => {
+    res.status(404).json({
+      errors: {
+        global: 'Something is wrong here',
+      },
+    });
+  });
 });
 
 app.post('/api/link', (req, res) => {
@@ -50,13 +72,11 @@ app.put('/api/links/:id', (req, res) => {
   }
 });
 
-app.get('/api/links/:id', (req, res) => {
-  db.getById(req.params.id)
-  .then((data) => {
-    res.send(data);
-  })
+app.delete('/api/links/:id', (req, res) => {
+  db.deleteLink(req.params.id)
+  .then(() => res.send({}))
   .catch(() => {
-    res.status(404).json({
+    res.status(500).json({
       errors: {
         global: 'Something is wrong here',
       },
