@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/DemyanchikVadim/url-shortener-api#readme",
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "body-parser": "1.15.2",
     "express": "4.14.1",
     "mongoose": "4.8.3",
