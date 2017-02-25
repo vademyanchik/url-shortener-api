@@ -1,9 +1,13 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
 import '../models/Link';
+import '../models/User';
 import createHash from './CreateHash';
 import { dbUrl } from '../etc/config.json';
 
+
 const Link = mongoose.model('Link');
+const User = mongoose.model('User');
 const hashLen = 3;
 const baseUrl = 'http://localhost:8080';
 
@@ -14,6 +18,18 @@ export function setUpConnection() {
 
 export function listLinks() {
   return Link.find();
+}
+
+export function createUser(data) {
+  const { username, email, password } = data;
+  const passwordHash = bcrypt.hashSync(password, 10);
+  const user = new User({
+    username: username,
+    email: email,
+    password: passwordHash,
+    createdAt: new Date(),
+  });
+  return user.save();
 }
 
 export function createLink(data) {
