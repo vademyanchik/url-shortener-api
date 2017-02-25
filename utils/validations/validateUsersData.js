@@ -1,6 +1,10 @@
 import validator from 'validator';
+import mongoose from 'mongoose';
+import '../../models/User';
 
-function validateUsersData(data) {
+const User = mongoose.model('User');
+
+function validateInput(data) {
   const errors = {};
 
   if (validator.isEmpty(data.username)) {
@@ -27,6 +31,32 @@ function validateUsersData(data) {
     errors,
     isValid,
   };
+}
+
+function validateUsersData(data) {
+  const { errors } = validateInput(data);
+
+  return User.find({
+    $or: [
+      { username: data.username },
+      { email: data.email },
+    ],
+  })
+    .then((user) => {
+      if (user.length) {
+        if (user[0].username === data.username) {
+          errors.username = 'Sorry, username has been taken';
+        }
+        if (user[0].email === data.email) {
+          errors.email = 'Email is already registered';
+        }
+      }
+      const isValid = Object.keys(errors).length === 0;
+      return {
+        errors,
+        isValid,
+      };
+    });
 }
 
 export default validateUsersData;
