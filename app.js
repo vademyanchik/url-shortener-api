@@ -1,8 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import * as db from './utils/DataBaseUtils';
 import validateLinksData from './utils/validations/validateLinksData';
 import validateUsersData from './utils/validations/validateUsersData';
+import { jwtSecret } from './etc/config.json';
 
 const app = express();
 
@@ -26,6 +29,32 @@ app.post('/api/users', (req, res) => {
       res.status(400).json({ errors });
     }
   });
+});
+
+app.post('/api/auth', (req, res) => {
+  db.authUser(req.body)
+    .then((user) => {
+      if (user.length) {
+        if (bcrypt.compareSync(req.body.password, user[0].password)) {
+          const token = jwt.sign({
+            id: user[0]._id,
+            username: user[0].username,
+          }, jwtSecret);
+          res.json({ token });
+        } else {
+          res.status(401).json({ errors: { global: 'Invalid Credentials' } });
+        }
+      } else {
+        res.status(401).json({ errors: { global: 'Invalid Credentials' } });
+      }
+    })
+    .catch(() => {
+      res.status(500).json({
+        errors: {
+          global: 'Something is wrong here',
+        },
+      });
+    });
 });
 
 app.get('/api/links', (req, res) => {

@@ -5,11 +5,8 @@ import '../models/User';
 import createHash from './CreateHash';
 import { dbUrl } from '../etc/config.json';
 
-
 const Link = mongoose.model('Link');
 const User = mongoose.model('User');
-const hashLen = 3;
-const baseUrl = 'http://localhost:8080';
 
 export function setUpConnection() {
   mongoose.Promise = global.Promise;
@@ -32,7 +29,18 @@ export function createUser(data) {
   return user.save();
 }
 
+export function authUser(data) {
+  return User.find({
+    $or: [
+      { username: data.identifier },
+      { email: data.identifier },
+    ],
+  });
+}
+
 export function createLink(data) {
+  const hashLen = 3;
+  const baseUrl = 'http://localhost:8080';
   const uniqueID = createHash(hashLen);
   const link = new Link({
     shortLink: `${baseUrl}/${uniqueID}`,
@@ -61,6 +69,7 @@ export function deleteLink(id) {
 }
 
 export function redirectUrl(id) {
+  const baseUrl = 'http://localhost:8080';
   const query = { shortLink: `${baseUrl}/${id}` };
   const count = { $inc: { count: 1 } };
   return Link.findOneAndUpdate(query, count);
