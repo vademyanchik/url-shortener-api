@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as db from './utils/DataBaseUtils';
+import authenticate from './utils/middlewares/authenticate';
 import validateLinksData from './utils/validations/validateLinksData';
 import validateUsersData from './utils/validations/validateUsersData';
 import { jwtSecret } from './etc/config.json';
@@ -57,7 +58,7 @@ app.post('/api/auth', (req, res) => {
     });
 });
 
-app.get('/api/links', (req, res) => {
+app.get('/api/links', authenticate, (req, res) => {
   db.listLinks()
   .then(data => res.send(data))
   .catch(() => {
@@ -69,7 +70,7 @@ app.get('/api/links', (req, res) => {
   });
 });
 
-app.get('/api/links/:id', (req, res) => {
+app.get('/api/links/:id', authenticate, (req, res) => {
   db.getLink(req.params.id)
   .then((data) => {
     res.send(data);
@@ -100,7 +101,7 @@ app.post('/api/link', (req, res) => {
   }
 });
 
-app.put('/api/links/:id', (req, res) => {
+app.put('/api/links/:id', authenticate, (req, res) => {
   const { errors, isValid } = validateLinksData(req.body);
   if (isValid) {
     db.updateLink(req.body, req.params.id)
@@ -119,7 +120,7 @@ app.put('/api/links/:id', (req, res) => {
   }
 });
 
-app.delete('/api/links/:id', (req, res) => {
+app.delete('/api/links/:id', authenticate, (req, res) => {
   db.deleteLink(req.params.id)
   .then(() => res.send({}))
   .catch(() => {
